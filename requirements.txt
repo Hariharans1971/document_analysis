@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-docx
+PyMuPDF
+textstat
+nltk
+python-multipart
+streamlit
+google-genai
+python-dotenv
