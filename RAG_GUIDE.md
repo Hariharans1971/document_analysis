@@ -31,8 +31,7 @@ Requires Python 3.10+.
 git clone https://github.com/Hariharans1971/document_analysis.git
 cd document_analysis
 python -m venv .venv
-python -m pip install -r requirements.txt
-python -m pip install httpx
+python -m pip install -r requirements-dev.txt
 ```
 
 Activate the virtual environment:
@@ -47,6 +46,15 @@ uvicorn app.rag_api:app --reload
 ```
 
 Open [http://127.0.0.1:8000](http://127.0.0.1:8000) for the browser workspace or [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) for interactive API documentation.
+
+### Run with Docker
+
+```bash
+docker build -t document-rag .
+docker run --rm -p 8000:8000 --env-file .env document-rag
+```
+
+Create a local `.env` from `.env.example` only if you want optional Gemini generation. Do not commit the real `.env` file. Uploaded files are held in memory; this container does not persist the index.
 
 ### API endpoints
 
@@ -87,7 +95,7 @@ The CLI supports TXT, Markdown, PDF, and DOCX. Scanned PDFs without an embedded 
 ## Tests
 
 ```bash
-python -m pip install httpx
+python -m pip install -r requirements-dev.txt
 python -m unittest tests.test_rag tests.test_rag_api -v
 ```
 
