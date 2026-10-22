@@ -61,7 +61,7 @@ The benchmark reports Recall@1, Recall@3, and mean reciprocal rank (MRR) for six
 
 ## Architecture and API documentation
 
-See [RAG_GUIDE.md](RAG_GUIDE.md) for the request flow, API endpoints, setup, limitations, and next steps.
+See [RAG_GUIDE.md](RAG_GUIDE.md) for the request flow and API reference, and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for design decisions, trade-offs, security constraints, and evaluation strategy.
 
 ## Important limitations
 
