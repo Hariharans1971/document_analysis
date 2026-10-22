@@ -1,88 +1,111 @@
 # Document Q&A with Retrieval-Augmented Generation (RAG)
 
-This repository now includes an educational RAG retrieval core in `app/rag.py`. It chunks a text or Markdown document, ranks relevant passages, returns source labels, and can optionally ask Gemini to draft an answer grounded in those passages.
-
-## Why RAG?
-
-A language model's internal knowledge is not a substitute for a specific source document. RAG first retrieves evidence from the document and then passes that evidence to the model. The numbered source labels make the response easier to verify.
+This project now includes a browser-based RAG workspace and a FastAPI API. It accepts TXT, Markdown, PDF, and DOCX documents, retrieves relevant text passages, returns source labels, and optionally uses Gemini to draft a grounded answer.
 
 ## Architecture
 
 ```text
-Text / Markdown file
+Browser UI (HTML/CSS/JavaScript)
+        | multipart upload / JSON question
+        v
+FastAPI API (upload validation, extraction, endpoints)
         |
         v
-Chunking with overlap
+Document parsing + overlapping chunks
         |
         v
-Token normalization + TF-IDF-style retrieval
+Lexical TF-IDF-style retrieval
         |
-        v
-Top-k evidence passages + source labels
+        +---- retrieval-only response with source passages
         |
-        +---- no API key ----> print retrieved evidence
-        |
-        +---- Gemini API ----> grounded answer with citations
+        +---- optional Gemini answer grounded in passages
 ```
 
-The current implementation intentionally uses a transparent, lightweight lexical retriever. It does not use embeddings or a vector database yet. This keeps the retrieval layer runnable without a paid service or API key and makes the scoring easy to inspect.
+The retrieval core deliberately uses transparent lexical scoring rather than embeddings today. It is inexpensive to run, has no vector-store dependency, and is easy to test. Embedding retrieval is a planned upgrade, not a feature currently claimed.
 
 ## Setup
 
+Requires Python 3.10+.
+
 ```bash
+git clone https://github.com/Hariharans1971/document_analysis.git
+cd document_analysis
 python -m venv .venv
-```
-
-Activate the virtual environment, then install project dependencies:
-
-```bash
 python -m pip install -r requirements.txt
+python -m pip install httpx
 ```
 
-## Retrieve passages without an API key
+Activate the virtual environment:
 
-Use a local `sample.md`, `sample.txt`, `manual.pdf`, or `guide.docx`, then run:
+- Windows PowerShell: `.venv\\Scripts\\Activate.ps1`
+- macOS/Linux: `source .venv/bin/activate`
+
+## Run the full-stack RAG app
 
 ```bash
-python -m app.rag sample.md "How does the system handle errors?" --top-k 4
+uvicorn app.rag_api:app --reload
 ```
 
-The RAG CLI supports `.txt`, `.md`, `.pdf`, and `.docx`. PDF/DOCX text is extracted using the existing document parser; scanned PDFs without an embedded text layer still need OCR.
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000) for the browser workspace or [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) for interactive API documentation.
 
-## Optional Gemini generation
+### API endpoints
 
-Set `GEMINI_API_KEY` in your shell. The existing requirements include the Google GenAI SDK.
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/health` | Health check and current document count |
+| GET | `/api/documents` | List documents currently indexed |
+| POST | `/api/documents` | Upload TXT, MD, PDF, or DOCX using multipart form data |
+| DELETE | `/api/documents/{document_id}` | Remove a document and its chunks |
+| POST | `/api/query` | Retrieve source passages and optionally generate an answer |
+
+The upload endpoint has a 10 MB limit. Retrieval-only mode works without a model API key. To generate answers, set `GEMINI_API_KEY`; optionally set `GEMINI_MODEL` (defaults to `gemini-2.5-flash`).
 
 Windows PowerShell:
 
 ```powershell
 $env:GEMINI_API_KEY = "your-key"
-python -m app.rag sample.md "Summarize the setup steps" --generate
+uvicorn app.rag_api:app --reload
 ```
 
 macOS/Linux:
 
 ```bash
 export GEMINI_API_KEY="your-key"
-python -m app.rag sample.md "Summarize the setup steps" --generate
+uvicorn app.rag_api:app --reload
 ```
 
-Optional environment variable: `GEMINI_MODEL` (defaults to `gemini-2.5-flash`). Do not commit API keys. Retrieved passages are untrusted document content; the prompt instructs the model not to follow instructions embedded in source documents. This is a defense-in-depth measure, not a guarantee against prompt injection.
+Never commit API keys. Retrieved document content is untrusted input; prompt-injection defenses are best-effort, not a security guarantee.
+
+## CLI retrieval without a server
+
+```bash
+python -m app.rag sample.pdf "What does the document say about setup?" --top-k 4
+```
+
+The CLI supports TXT, Markdown, PDF, and DOCX. Scanned PDFs without an embedded text layer need OCR.
 
 ## Tests
 
 ```bash
-python -m unittest discover -s tests -v
+python -m pip install httpx
+python -m unittest tests.test_rag tests.test_rag_api -v
 ```
 
-## Limitations and next steps
+GitHub Actions runs these retrieval and API tests on pushes and pull requests. Check the repository's Actions tab for the current result.
 
-- Lexical retrieval can miss semantically similar passages that use different words.
-- No embedding model, vector store, reranker, or document-level access control is included yet.
-- Citation labels point to retrieved chunks; they do not guarantee every generated claim is supported.
-- Large or scanned PDFs need OCR and bounded ingestion before they can be indexed safely.
-- Production deployments should add file-size/type validation, access control, tenant isolation, logging, evaluation datasets, and retrieval-quality metrics.
+## Current limitations
 
-## Evaluation plan
+- Documents and chunks are held in process memory and disappear when the server restarts.
+- The app is a single-process portfolio demo; it has no login, tenant isolation, or persistent index.
+- Lexical retrieval can miss semantically similar passages with different vocabulary.
+- Source labels help verification but do not prove every generated claim is supported.
+- Scanned PDFs need OCR; no OCR pipeline is included.
+- Do not upload confidential or regulated documents to this demo.
 
-For a serious portfolio version, create 20–50 question/expected-source pairs and measure Recall@k, citation correctness, and answer faithfulness. Compare lexical retrieval against an embedding-based baseline before claiming quality improvements.
+## Next engineering upgrades
+
+1. Add embedding-based retrieval and a persistent vector database.
+2. Add a small question/expected-source evaluation set and report Recall@k.
+3. Add authentication, per-user document access, persistent storage, and audit logging.
+4. Evaluate citation correctness and answer faithfulness before claiming model quality.
+5. Containerize the service and deploy with appropriate limits and secrets management.
