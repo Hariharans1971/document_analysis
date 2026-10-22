@@ -23,8 +23,7 @@ Requires Python 3.10+.
 git clone https://github.com/Hariharans1971/document_analysis.git
 cd document_analysis
 python -m venv .venv
-python -m pip install -r requirements.txt
-python -m pip install httpx
+python -m pip install -r requirements-dev.txt
 uvicorn app.rag_api:app --reload
 ```
 
@@ -32,6 +31,15 @@ Open:
 - Browser workspace: http://127.0.0.1:8000
 - Interactive REST API: http://127.0.0.1:8000/docs
 - Health check: http://127.0.0.1:8000/health
+
+## Docker
+
+```bash
+docker build -t document-rag .
+docker run --rm -p 8000:8000 document-rag
+```
+
+To enable Gemini generation, create a local `.env` from `.env.example` and pass it with `--env-file .env`. Never commit your real key. The in-memory document index resets when the container stops.
 
 RAG works in retrieval-only mode without an API key. To enable answer generation, configure `GEMINI_API_KEY` in your environment before starting the app.
 
