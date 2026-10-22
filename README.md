@@ -1,23 +1,19 @@
 # Document Analysis, Migration Readiness & RAG
 
-A Python project for analyzing PDF/DOCX structure and evaluating documentation migration readiness, with a Retrieval-Augmented Generation (RAG) module for source-grounded document Q&A.
+A Python portfolio project combining PDF/DOCX analysis with a browser-based Retrieval-Augmented Generation (RAG) workspace. Upload documents, retrieve source passages, and optionally generate answers with Gemini.
 
-## Features
+## What is implemented
 
-- PDF and DOCX parsing for document analysis and RAG retrieval
-- Structural metrics, readability heuristics, and migration-readiness reports
-- Optional LLM-assisted document analysis using the existing provider integration
-- Text chunking and lexical retrieval with source labels
-- Optional Gemini answer generation grounded in retrieved passages
-- Unit tests for retrieval and ranking
+- **Document analysis:** PDF/DOCX parsing, structure metrics, readability heuristics, migration-readiness reports, and existing analysis workflow.
+- **Full-stack RAG:** FastAPI endpoints plus an HTML/CSS/JavaScript browser interface.
+- **Ingestion:** TXT, Markdown, PDF, and DOCX uploads, with a 10 MB limit and text-extraction checks.
+- **Retrieval:** overlapping chunks and transparent lexical ranking with source labels.
+- **Optional generation:** Gemini answers grounded in retrieved passages when `GEMINI_API_KEY` is configured.
+- **Engineering:** API validation, document removal, unit/API tests, and GitHub Actions.
 
 ## Technology
 
-- Python
-- PyMuPDF and python-docx
-- FastAPI/Streamlit dependencies for existing app workflows
-- Google GenAI SDK for optional RAG generation
-- Python standard-library retrieval core
+Python · FastAPI · SQLite-free in-memory demo store · HTML/CSS/JavaScript · PyMuPDF · python-docx · Google GenAI SDK · unittest
 
 ## Quick start
 
@@ -28,48 +24,35 @@ git clone https://github.com/Hariharans1971/document_analysis.git
 cd document_analysis
 python -m venv .venv
 python -m pip install -r requirements.txt
+python -m pip install httpx
+uvicorn app.rag_api:app --reload
 ```
 
-Activate the virtual environment before running the commands below.
+Open:
+- Browser workspace: http://127.0.0.1:8000
+- Interactive REST API: http://127.0.0.1:8000/docs
+- Health check: http://127.0.0.1:8000/health
 
-## RAG: retrieve evidence from a document
+RAG works in retrieval-only mode without an API key. To enable answer generation, configure `GEMINI_API_KEY` in your environment before starting the app.
 
-The CLI supports `.txt`, `.md`, `.pdf`, and `.docx` files:
+## Tests
 
 ```bash
-python -m app.rag sample.pdf "What does the document say about setup?" --top-k 4
+python -m unittest tests.test_rag tests.test_rag_api -v
 ```
 
-Retrieval works without an API key and prints the passages ranked as relevant. For a generated answer with source labels, configure `GEMINI_API_KEY` and add `--generate`.
+## Architecture and API documentation
 
-Full details: [RAG_GUIDE.md](RAG_GUIDE.md).
+See [RAG_GUIDE.md](RAG_GUIDE.md) for the request flow, API endpoints, setup, limitations, and next steps.
 
-## Existing document analysis workflow
+## Important limitations
 
-The repository also includes document parsing, metrics, migration-readiness analysis, and optional LLM analysis modules. Check `run.py` and `ui.py` for the current entry points.
-
-## Run tests
-
-```bash
-python -m unittest discover -s tests -v
-```
-
-## Security and limitations
-
-- Never commit API keys, passwords, or confidential documents.
-- Use synthetic or public documents while testing.
-- RAG retrieval is lexical today; embeddings and vector databases are future improvements.
-- LLM responses can still be wrong. Verify important claims against cited source passages.
-- Scanned PDFs without an embedded text layer require OCR.
-- Do not upload private or regulated documents to external model providers without authorization.
+This is an educational single-process demo. Uploaded documents and chunks stay in memory and are lost on restart. Retrieval currently uses lexical ranking, not embeddings or a vector database. There is no authentication, multi-user isolation, OCR, or production security layer. Do not upload confidential or regulated documents.
 
 ## Roadmap
 
-- Embedding-based retrieval and a persistent vector store
-- Evaluation set with Recall@k and citation faithfulness checks
-- FastAPI endpoints and a document-chat interface
-- Docker deployment and structured observability
-
-## Author
-
-Hariharan S. — B.Tech Computer Science and Engineering (AI & ML), 2026
+- Embedding retrieval and persistent vector storage
+- Retrieval evaluation (Recall@k) and citation-faithfulness checks
+- Authentication and per-user document permissions
+- Persistent index, structured logging, and Docker deployment
+- OCR support for scanned PDFs
