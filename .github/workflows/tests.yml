@@ -21,3 +21,5 @@ jobs:
           cache: pip
       - run: python -m pip install -r requirements-dev.txt
       - run: python -m unittest tests.test_rag tests.test_rag_api -v
+      - name: Run synthetic retrieval benchmark
+        run: python benchmarks/retrieval_eval.py
