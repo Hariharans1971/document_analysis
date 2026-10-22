@@ -10,6 +10,7 @@ import uuid
 from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from app.rag import answer_with_gemini, chunk_text, retrieve
@@ -23,6 +24,11 @@ app = FastAPI(
     description="Upload a document, retrieve source passages, and optionally generate a cited answer.",
     version="1.0.0",
 )
+
+
+@app.get("/", include_in_schema=False)
+def workspace():
+    return FileResponse(Path(__file__).resolve().parent.parent / "static" / "rag.html")
 
 
 @app.on_event("startup")
