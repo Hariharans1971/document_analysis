@@ -15,6 +15,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
+from app.parser import parse_document
+
 
 TOKEN_RE = re.compile(r"[a-zA-Z0-9][a-zA-Z0-9_'-]*")
 
@@ -103,7 +105,13 @@ def retrieve_from_file(file_path: str | Path, question: str, top_k: int = 4) -> 
     path = Path(file_path)
     if not path.is_file():
         raise FileNotFoundError(f"Document not found: {path}")
-    text = path.read_text(encoding="utf-8")
+    extension = path.suffix.lower()
+    if extension in {".pdf", ".docx"}:
+        text = parse_document(str(path))["text"]
+    elif extension in {".txt", ".md"}:
+        text = path.read_text(encoding="utf-8")
+    else:
+        raise ValueError("Supported formats are .txt, .md, .pdf, and .docx")
     chunks = chunk_text(text, source=path.name)
     return retrieve(question, chunks, top_k=top_k)
 
