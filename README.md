@@ -57,7 +57,7 @@ Run the deterministic synthetic retrieval benchmark:
 python benchmarks/retrieval_eval.py
 ```
 
-The benchmark reports Recall@1, Recall@3, and mean reciprocal rank (MRR) for six fixed synthetic queries. It is a reproducible smoke benchmark for code changes, not evidence of production retrieval quality. Evaluate a larger, independently labelled dataset before making quality or business-impact claims.
+The latest recorded CI run passed the automated tests and six-query synthetic retrieval benchmark: Recall@1 = 6/6 (1.000), Recall@3 = 6/6 (1.000), and MRR = 1.000. These scores apply only to a tiny synthetic fixture built around the demo's own documents; they are a smoke-test baseline, not production-quality evidence. A later CI run is checking the PyMuPDF import cleanup. Evaluate a larger, independently labelled dataset before making quality or business-impact claims.
 
 ## Architecture and API documentation
 
