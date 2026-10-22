@@ -43,11 +43,21 @@ To enable Gemini generation, create a local `.env` from `.env.example` and pass 
 
 RAG works in retrieval-only mode without an API key. To enable answer generation, configure `GEMINI_API_KEY` in your environment before starting the app.
 
-## Tests
+## Tests and retrieval evaluation
+
+Run the automated tests:
 
 ```bash
 python -m unittest tests.test_rag tests.test_rag_api -v
 ```
+
+Run the deterministic synthetic retrieval benchmark:
+
+```bash
+python benchmarks/retrieval_eval.py
+```
+
+The benchmark reports Recall@1, Recall@3, and mean reciprocal rank (MRR) for six fixed synthetic queries. It is a reproducible smoke benchmark for code changes, not evidence of production retrieval quality. Evaluate a larger, independently labelled dataset before making quality or business-impact claims.
 
 ## Architecture and API documentation
 
