@@ -41,13 +41,13 @@ python -m pip install -r requirements.txt
 
 ## Retrieve passages without an API key
 
-Create a local file such as `sample.md`, then run:
+Use a local `sample.md`, `sample.txt`, `manual.pdf`, or `guide.docx`, then run:
 
 ```bash
 python -m app.rag sample.md "How does the system handle errors?" --top-k 4
 ```
 
-Only `.txt` and `.md` are supported by this CLI retrieval function. The existing document-analysis parser supports PDF and DOCX for its analysis workflow; extending ingestion to those formats is a planned improvement.
+The RAG CLI supports `.txt`, `.md`, `.pdf`, and `.docx`. PDF/DOCX text is extracted using the existing document parser; scanned PDFs without an embedded text layer still need OCR.
 
 ## Optional Gemini generation
 
