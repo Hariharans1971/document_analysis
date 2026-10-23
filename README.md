@@ -57,7 +57,7 @@ Run the deterministic synthetic retrieval benchmark:
 python benchmarks/retrieval_eval.py
 ```
 
-The CI benchmark uses 24 labelled positive questions and 6 negative smoke queries across six synthetic documents. It reports Recall@1, Recall@3, and MRR for the TF-IDF-style retriever against a simple distinct-term-overlap baseline, plus the empty-result rate for negative queries. The questions and documents are authored alongside the demo, so these results are regression evidence—not an independent, representative real-world evaluation or proof of user/business impact. Use an independently labelled evaluation set before making production-quality claims.
+The CI benchmark uses 24 labelled positive questions and 6 negative smoke queries across six synthetic documents. The TF-IDF-style retriever achieved Recall@1 = 0.833 (20/24), Recall@3 = 1.000 (24/24), and MRR = 0.910; a distinct-term-overlap baseline achieved Recall@1 = 0.833, Recall@3 = 0.958 (23/24), and MRR = 0.889. All 6 negative smoke queries returned no passages. The questions and documents are authored alongside the demo, so these results are regression evidence—not an independent, representative real-world evaluation or proof of user/business impact. Use an independently labelled evaluation set before making production-quality claims.
 
 ## Architecture and API documentation
 
