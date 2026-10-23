@@ -57,7 +57,7 @@ Run the deterministic synthetic retrieval benchmark:
 python benchmarks/retrieval_eval.py
 ```
 
-The latest recorded CI run passed the automated tests and six-query synthetic retrieval benchmark: Recall@1 = 6/6 (1.000), Recall@3 = 6/6 (1.000), and MRR = 1.000. These scores apply only to a tiny synthetic fixture built around the demo's own documents; they are a smoke-test baseline, not production-quality evidence. A later CI run is checking the PyMuPDF import cleanup. Evaluate a larger, independently labelled dataset before making quality or business-impact claims.
+The CI benchmark uses 24 labelled positive questions and 6 negative smoke queries across six synthetic documents. It reports Recall@1, Recall@3, and MRR for the TF-IDF-style retriever against a simple distinct-term-overlap baseline, plus the empty-result rate for negative queries. The questions and documents are authored alongside the demo, so these results are regression evidence—not an independent, representative real-world evaluation or proof of user/business impact. Use an independently labelled evaluation set before making production-quality claims.
 
 ## Architecture and API documentation
 
